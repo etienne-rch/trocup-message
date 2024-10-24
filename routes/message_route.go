@@ -11,6 +11,7 @@ import (
 func MessageRoutes(app *fiber.App) {
 	// PUBLIC
 	app.Get("/health", handlers.HealthCheck)
+	app.Get("/ws", handlers.HandleConnections)
 
 	// PRIVATE : Routes protégées par le middleware ClerkAuthMiddleware
 	api := app.Group("/api", middleware.ClerkAuthMiddleware)

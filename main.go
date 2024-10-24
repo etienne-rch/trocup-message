@@ -8,6 +8,7 @@ import (
 	"os/signal"
 	"syscall"
 	"trocup-message/config"
+	"trocup-message/handlers"
 	"trocup-message/routes"
 
 	"github.com/clerk/clerk-sdk-go/v2"
@@ -49,6 +50,9 @@ func main() {
 	if port == "" {
 		port = "5004" // Default port if not specified
 	}
+
+	// Start the WebSocket message handling in a goroutine
+	go handlers.HandleMessages()
 
 	// Handle graceful shutdown
 	c := make(chan os.Signal, 1)
