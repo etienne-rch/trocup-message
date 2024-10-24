@@ -17,8 +17,8 @@ func MessageRoutes(app *fiber.App) {
 
 	api.Get("/messages", handlers.GetMessages)
 	api.Get("/messages/:id", handlers.GetMessageByID)
+	api.Get("/messages/rooms/:id", handlers.GetMessagesByRoomID)
 	api.Post("/messages", handlers.CreateMessage)
-	// api.Put("/messages/:id", handlers.UpdateMessage)
 	api.Delete("/messages/:id", handlers.DeleteMessage)
 
 	app.Use(func(c *fiber.Ctx) error {
