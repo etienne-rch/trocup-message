@@ -44,7 +44,7 @@ func InitMongo() {
 }
 
 func InitMessageCollection(dbName string) {
-	MessageCollection = Client.Database(dbName).Collection("message")
+	MessageCollection = Client.Database(dbName).Collection("messages")
 }
 
 func CleanUpTestDatabase(dbName string) {

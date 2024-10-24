@@ -16,10 +16,10 @@ func MessageRoutes(app *fiber.App) {
 	api := app.Group("/api", middleware.ClerkAuthMiddleware)
 
 	api.Get("/messages", handlers.GetMessages)
-	// app.Get("/messages/:id", handlers.GetMessageByID)
-	// api.Post("/messages", handlers.CreateMessage)
+	api.Get("/messages/:id", handlers.GetMessageByID)
+	api.Post("/messages", handlers.CreateMessage)
 	// api.Put("/messages/:id", handlers.UpdateMessage)
-	// api.Delete("/messages/:id", handlers.DeleteMessage)
+	api.Delete("/messages/:id", handlers.DeleteMessage)
 
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(404).SendString(fmt.Sprintf("Route not found: %s", c.Path()))
