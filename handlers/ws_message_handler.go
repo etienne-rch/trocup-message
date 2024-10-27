@@ -7,13 +7,21 @@ func HandleMessages() {
 		// Receive message from the broadcast channel
 		msg := <-broadcast
 
-		// Send message to all connected clients
-		for client := range clients {
+		// Retrieve the room
+		roomID := msg.RoomID
+		room, exists := rooms[roomID]
+		if !exists {
+			fmt.Printf("Room %s not found\n", roomID)
+			continue
+		}
+
+		// Send message to all clients in the specified room
+		for client := range room.clients {
 			err := client.WriteJSON(msg)
 			if err != nil {
 				fmt.Println("Error sending message:", err)
 				client.Close()
-				delete(clients, client)
+				delete(room.clients, client)
 			}
 		}
 	}
