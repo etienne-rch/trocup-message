@@ -14,13 +14,14 @@ func TestMessage(t *testing.T) {
 		t.Fatalf("failed to create ObjectID: %v", err)
 	}
 
+	idStr := id.Hex()
 	now := time.Now()
 
 	message := models.Message{
 		ID:       id,
 		RoomID:   "room1",
-		Sender:   id,
-		Receiver: id,
+		Sender:   idStr,
+		Receiver: idStr,
 		Message:  "Hello, World!",
 		SentAt:   now,
 	}
@@ -31,10 +32,10 @@ func TestMessage(t *testing.T) {
 	if message.RoomID != "room1" {
 		t.Errorf("expected RoomID to be 'room1', got %s", message.RoomID)
 	}
-	if message.Sender != id {
+	if message.Sender != idStr {
 		t.Errorf("expected Sender to be %v, got %v", id, message.Sender)
 	}
-	if message.Receiver != id {
+	if message.Receiver != idStr {
 		t.Errorf("expected Receiver to be %v, got %v", id, message.Receiver)
 	}
 	if message.Message != "Hello, World!" {
