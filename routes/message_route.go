@@ -9,18 +9,20 @@ import (
 )
 
 func MessageRoutes(app *fiber.App) {
-	// PUBLIC
-	app.Get("/health", handlers.HealthCheck)
-	app.Get("/ws", handlers.HandleConnections)
+	// Routes publiques : accessibles sans authentification
+	public := app.Group("/api")
 
-	// PRIVATE : Routes protégées par le middleware ClerkAuthMiddleware
-	api := app.Group("/api", middleware.ClerkAuthMiddleware)
+	public.Get("/health", handlers.HealthCheck)
+	public.Get("/ws", handlers.HandleConnections)
 
-	api.Get("/messages", handlers.GetMessages)
-	api.Get("/messages/:id", handlers.GetMessageByID)
-	api.Get("/messages/rooms/:id", handlers.GetMessagesByRoomID)
-	api.Post("/messages", handlers.CreateMessage)
-	api.Delete("/messages/:id", handlers.DeleteMessage)
+	// Routes protégées : accessibles uniquement avec authentification
+	protected := app.Group("/api/protected", middleware.ClerkAuthMiddleware)
+
+	protected.Get("/messages", handlers.GetMessages)
+	protected.Get("/messages/:id", handlers.GetMessageByID)
+	protected.Get("/messages/rooms/:id", handlers.GetMessagesByRoomID)
+	protected.Post("/messages", handlers.CreateMessage)
+	protected.Delete("/messages/:id", handlers.DeleteMessage)
 
 	app.Use(func(c *fiber.Ctx) error {
 		return c.Status(404).SendString(fmt.Sprintf("Route not found: %s", c.Path()))
