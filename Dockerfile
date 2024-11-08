@@ -1,4 +1,5 @@
-FROM golang:1.18-alpine
+# Build stage
+FROM golang:1.22-alpine AS builder
 
 # Définir le répertoire de travail
 WORKDIR /app
@@ -13,8 +14,13 @@ COPY . .
 # Construire l'application
 RUN go build -o app
 
-# Exposer le port sur lequel l'application écoute
+# Final stage
+FROM alpine:latest
+
+WORKDIR /app
+
+COPY --from=builder /app/app .
+
 EXPOSE 5004
 
-# Définir la commande par défaut pour exécuter l'application
 CMD ["./app"]
