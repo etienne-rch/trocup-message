@@ -19,7 +19,8 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o app
 # Final stage
 FROM alpine:latest
 
-# Set constants for user IDs
+# Set constants for user/group IDs and name
+ENV APP_USER=svc_nonroot
 ENV APP_UID=10001
 ENV APP_GID=10001
 
@@ -32,10 +33,9 @@ WORKDIR /app
 # Copy the binary from builder
 COPY --from=builder /app/app .
 
-# Create user with random name but fixed UID
-RUN export RANDOM_USER="svc_$(head -c 8 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)" && \
-    addgroup -S -g ${APP_GID} appgroup && \
-    adduser -S -g appgroup -u ${APP_UID} ${RANDOM_USER} && \
+# Create user with fixed name and UID
+RUN addgroup -S -g ${APP_GID} appgroup && \
+    adduser -S -g appgroup -u ${APP_UID} ${APP_USER} && \
     # Set proper permissions
     chown -R ${APP_UID}:${APP_GID} /app && \
     chmod -R 550 /app && \
