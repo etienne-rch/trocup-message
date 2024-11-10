@@ -22,7 +22,7 @@ FROM alpine:latest
 WORKDIR /app
 
 # Add ca-certificates for HTTPS
-RUN apk --no-cache add ca-certificates  
+RUN apk --no-cache add ca-certificates wget  
 
 # Copy the binary from builder
 COPY --from=builder /app/app .
@@ -35,6 +35,6 @@ EXPOSE 5004
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:5004/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5004/api/health || exit 1
 
-CMD ["./app"]
+CMD ["./app"]   
