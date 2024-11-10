@@ -19,22 +19,35 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o app
 # Final stage
 FROM alpine:latest
 
-WORKDIR /app
+# Set constants for user IDs
+ENV APP_UID=10001
+ENV APP_GID=10001
 
-# Add ca-certificates for HTTPS
-RUN apk --no-cache add ca-certificates wget  
+# Update Alpine and add necessary packages
+RUN apk --no-cache upgrade && \
+    apk --no-cache add ca-certificates wget
+
+WORKDIR /app
 
 # Copy the binary from builder
 COPY --from=builder /app/app .
 
-# Create a non-root user
-RUN adduser -D appuser
-USER appuser
+# Create user with random name but fixed UID
+RUN export RANDOM_USER="svc_$(head -c 8 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | fold -w 8 | head -n 1)" && \
+    addgroup -S -g ${APP_GID} appgroup && \
+    adduser -S -g appgroup -u ${APP_UID} ${RANDOM_USER} && \
+    # Set proper permissions
+    chown -R ${APP_UID}:${APP_GID} /app && \
+    chmod -R 550 /app && \
+    chmod 500 /app/app
 
-EXPOSE 5004
+# Use the numerical UID/GID instead of username
+USER ${APP_UID}:${APP_GID}
+
+EXPOSE 5001
 
 # Add healthcheck
 HEALTHCHECK --interval=30s --timeout=3s \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:5004/api/health || exit 1
+  CMD wget --no-verbose --tries=1 --spider http://localhost:5001/api/health || exit 1
 
-CMD ["./app"]   
+CMD ["./app"]
