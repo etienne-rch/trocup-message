@@ -24,14 +24,13 @@ func main() {
 	_ = godotenv.Load()
 
 	app := fiber.New(fiber.Config{
-		Network: "tcp",
+		Network:      "tcp",
 		ReadTimeout:  30 * time.Second,
 		WriteTimeout: 30 * time.Second,
 		IdleTimeout:  120 * time.Second,
-		AppName: "Trocup Message Microservice",
+		AppName:      "Trocup Message Microservice",
 	})
 
-	
 	// Get allowed origins from environment variable
 	allowedOrigins := os.Getenv("ALLOWED_ORIGINS")
 
@@ -85,7 +84,7 @@ func main() {
 	select {
 	case <-shutdown:
 		log.Println("Shutting down server...")
-		
+
 		// Create a context with timeout for shutdown
 		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
