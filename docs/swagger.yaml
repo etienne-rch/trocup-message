@@ -1,0 +1,111 @@
+basePath: /
+definitions:
+  models.Message:
+    properties:
+      _id:
+        type: string
+      message:
+        type: string
+      receiver:
+        type: string
+      roomID:
+        type: string
+      sender:
+        type: string
+      sentAt:
+        type: string
+    type: object
+host: localhost:5004
+info:
+  contact:
+    email: support@trocup-message.com
+    name: Support TrocUp Message
+  description: API pour gérer les messages dans l'application TrocUp
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://trocup-message.com/terms
+  title: TrocUp Message API
+  version: "1.0"
+paths:
+  /messages:
+    get:
+      description: Récupère la liste de tous les messages
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Message'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtenir tous les messages
+      tags:
+      - Messages
+    post:
+      consumes:
+      - application/json
+      description: Ajoute un nouveau message dans la base de données
+      parameters:
+      - description: Détails du message
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/models.Message'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Créer un nouveau message
+      tags:
+      - Messages
+  /messages/{id}:
+    get:
+      description: Récupère un message à partir de son ID
+      parameters:
+      - description: ID du message
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Message'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties: true
+            type: object
+        "404":
+          description: Not Found
+          schema:
+            additionalProperties: true
+            type: object
+      summary: Obtenir un message par ID
+      tags:
+      - Messages
+swagger: "2.0"
