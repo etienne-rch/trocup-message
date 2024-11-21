@@ -1,0 +1,201 @@
+openapi: 3.0.0
+info:
+  title: Trocup Message API
+  description: API pour gérer les messages sur Trocup
+  version: 1.0.0
+servers:
+  - url: http://localhost:5004
+    description: Serveur de développement local
+
+paths:
+  /api/health:
+    get:
+      summary: Vérification de l'état du service
+      description: Route simple pour vérifier si le service est actif.
+      responses:
+        '200':
+          description: Service actif
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "success"
+                  message:
+                    type: string
+                    example: "Service is up and running!"
+        '500':
+          description: Erreur interne du serveur
+
+  /api/ws:
+    get:
+      summary: Connexion WebSocket
+      description: Permet d'établir une connexion WebSocket pour échanger des messages en temps réel.
+      parameters:
+        - name: roomID
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Identifiant de la salle de discussion
+      responses:
+        '101':
+          description: Connexion WebSocket établie
+        '400':
+          description: roomID manquant
+
+  /api/protected/messages:
+    get:
+      summary: Récupérer tous les messages
+      description: Permet de récupérer tous les messages disponibles.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Messages récupérés avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '500':
+          description: Erreur interne du serveur
+    post:
+      summary: Créer un message
+      description: Permet de créer un nouveau message.
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                content:
+                  type: string
+                  description: Contenu du message
+                roomID:
+                  type: string
+                  description: Identifiant de la salle de discussion
+                sender:
+                  type: string
+                  description: Identifiant de l'utilisateur qui envoie le message
+              required:
+                - content
+                - roomID
+                - sender
+      responses:
+        '201':
+          description: Message créé avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          description: Corps de requête invalide
+        '403':
+          description: Permission refusée
+        '500':
+          description: Erreur interne du serveur
+
+  /api/protected/messages/{id}:
+    get:
+      summary: Récupérer un message par son ID
+      description: Permet de récupérer un message spécifique à partir de son identifiant.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifiant unique du message
+      responses:
+        '200':
+          description: Message récupéré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '404':
+          description: Message introuvable
+    delete:
+      summary: Supprimer un message
+      description: Permet de supprimer un message spécifique par son identifiant.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifiant unique du message
+      responses:
+        '204':
+          description: Message supprimé avec succès
+        '404':
+          description: Message introuvable
+        '403':
+          description: Permission refusée
+        '500':
+          description: Erreur interne du serveur
+
+  /api/protected/messages/rooms/{id}:
+    get:
+      summary: Récupérer les messages d'une salle de discussion
+      description: Permet de récupérer tous les messages d'une salle de discussion spécifique.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Identifiant unique de la salle de discussion
+      responses:
+        '200':
+          description: Messages récupérés avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Message'
+        '404':
+          description: Salle de discussion introuvable
+        '500':
+          description: Erreur interne du serveur
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "63bfe9408d5894004d4b827c"
+        content:
+          type: string
+          example: "Hello, this is a message"
+        roomID:
+          type: string
+          example: "room123"
+        sender:
+          type: string
+          example: "user456"
+        sentAt:
+          type: string
+          format: date-time
+          example: "2024-11-20T14:25:23Z"
