@@ -13,10 +13,6 @@ This is a message management microservice built with Go, Fiber, and MongoDB.
 5. Run `copy .env.example to .env`
 6. Run the service: `go run main.go`
 
-go install github.com/swaggo/swag/cmd/swag@latest
-go get -u github.com/swaggo/gin-swagger
-go get -u github.com/swaggo/files
 
-go get -u github.com/swaggo/fiber-swagger
-go get -u github.com/swaggo/swag/cmd/swag
-go get github.com/gofiber/swagger
+git clone https://github.com/swagger-api/swagger-ui.git
+npx serve
